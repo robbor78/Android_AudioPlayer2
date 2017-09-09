@@ -1,6 +1,8 @@
 package com.domain.company.audioplayer2;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
@@ -8,6 +10,7 @@ import android.widget.Toast;
 public class PlayerService extends IntentService {
 
     private static final String TAG = "PlayerService";
+    private static final int ONGOING_NOTIFICATION_ID = 1;
 
     public PlayerService() {
         super("PlayerService");
@@ -22,8 +25,22 @@ public class PlayerService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // Normally we would do some work here, like download a file.
-        // For our sample, we just sleep for 5 seconds.
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification notification =
+                new Notification.Builder(this)
+                        .setContentTitle(getText(R.string.notification_title))
+                        .setContentText(getText(R.string.notification_message))
+                        .setSmallIcon(R.drawable.notification_icon)
+                        .setContentIntent(pendingIntent)
+                        .setTicker(getText(R.string.ticker_text))
+                        .build();
+
+        startForeground(ONGOING_NOTIFICATION_ID, notification);
+
         try {
             while (true) {
                 Log.d(TAG,"handling intent...");
