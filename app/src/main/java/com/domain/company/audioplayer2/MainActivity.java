@@ -1,8 +1,12 @@
 package com.domain.company.audioplayer2;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -11,6 +15,9 @@ public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
     private String filePath;
     private Intent intent;
+    private PlayerService mService;
+    private boolean mBound = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +38,19 @@ public class MainActivity extends Activity {
         } else {
             Log.d(TAG, "onCreate no intent");
 
-            //filePath = savedInstanceState.getString("FilePath");
-            TextView t = (TextView) findViewById(R.id.tvInfo);
-            t.setText(filePath);
-
         }
 
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart");
+        // Bind to LocalService
+        Intent intent = new Intent(this, PlayerService.class);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+    }
+
 
     @Override
     protected void onPause() {
@@ -49,6 +62,13 @@ public class MainActivity extends Activity {
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
+
+        // Unbind from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+
     }
 
     @Override
@@ -89,4 +109,26 @@ public class MainActivity extends Activity {
         startService(intent);
         Log.d(TAG, "starting service...");
     }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
+            mService = binder.getService();
+            mBound = true;
+
+            filePath = mService.getFilePath();
+            TextView t = (TextView) findViewById(R.id.tvInfo);
+            t.setText(filePath);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
+
 }

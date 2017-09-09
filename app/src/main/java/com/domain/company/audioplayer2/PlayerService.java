@@ -4,6 +4,8 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,6 +19,19 @@ public class PlayerService extends IntentService {
     private static final int ONGOING_NOTIFICATION_ID = 1;
 
     private boolean stop = false;
+    private String filePath;
+
+    // Binder given to clients
+    private final IBinder mBinder = new PlayerService.LocalBinder();
+
+
+    public class LocalBinder extends Binder {
+        PlayerService getService() {
+            // Return this instance of LocalService so clients can call public methods
+            return PlayerService.this;
+        }
+    }
+
 
     public PlayerService() {
         super("PlayerService");
@@ -42,7 +57,7 @@ public class PlayerService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         stop = false;
-        String filePath = intent.getStringExtra("FilePath");
+        filePath = intent.getStringExtra("FilePath");
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
@@ -75,4 +90,14 @@ public class PlayerService extends IntentService {
         }
 
     }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
 }
