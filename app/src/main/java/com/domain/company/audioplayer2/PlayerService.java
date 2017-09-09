@@ -2,9 +2,12 @@ package com.domain.company.audioplayer2;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.Toast;
 
 public class PlayerService extends IntentService {
+
+    private static final String TAG = "PlayerService";
 
     public PlayerService() {
         super("PlayerService");
@@ -13,6 +16,7 @@ public class PlayerService extends IntentService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "player starting", Toast.LENGTH_SHORT).show();
+        Log.d(TAG,"player starting...");
         return super.onStartCommand(intent,flags,startId);
     }
 
@@ -22,6 +26,7 @@ public class PlayerService extends IntentService {
         // For our sample, we just sleep for 5 seconds.
         try {
             while (true) {
+                Log.d(TAG,"handling intent...");
                 Thread.sleep(10000);
             }
         } catch (InterruptedException e) {

@@ -23,6 +23,9 @@
             </intent-filter>
 
         </activity>
+
+        <service android:name=".PlayerService" />
+
     </application>
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
