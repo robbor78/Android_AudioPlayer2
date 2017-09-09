@@ -4,14 +4,15 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class PlayerService extends IntentService {
 
@@ -19,7 +20,9 @@ public class PlayerService extends IntentService {
     private static final int ONGOING_NOTIFICATION_ID = 1;
 
     private boolean stop = false;
+    private boolean isPlaying = false;
     private String filePath;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
 
     // Binder given to clients
     private final IBinder mBinder = new PlayerService.LocalBinder();
@@ -47,7 +50,7 @@ public class PlayerService extends IntentService {
     @Override
     public void onDestroy() {
         // The service is no longer used and is being destroyed
-        Log.d(TAG,"onDestroy");
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         stop = true;
     }
@@ -63,7 +66,7 @@ public class PlayerService extends IntentService {
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP |
                 Intent.FLAG_ACTIVITY_CLEAR_TOP);//FLAG_ACTIVITY_NEW_TASK);
-        notificationIntent.putExtra("FilePath",filePath);
+        notificationIntent.putExtra("FilePath", filePath);
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -81,12 +84,20 @@ public class PlayerService extends IntentService {
 
         try {
             while (!stop) {
-                Log.d(TAG, "handling intent... "+filePath);
+                Log.d(TAG, "handling intent... " + filePath);
                 Thread.sleep(10000);
             }
         } catch (InterruptedException e) {
             // Restore interrupt status.
             Thread.currentThread().interrupt();
+        }
+
+
+        try {
+            stop();
+            mediaPlayer.release();
+        } finally {
+            mediaPlayer = null;
         }
 
     }
@@ -98,6 +109,75 @@ public class PlayerService extends IntentService {
 
     public String getFilePath() {
         return filePath;
+    }
+
+    public void toggle() {
+        if (isPlaying) {
+            stop();
+        } else {
+            play();
+        }
+    }
+
+    public void stop() {
+
+
+        if (!isPlaying) {
+            return;
+        }
+
+        try {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+//            observer.stop();
+//            observer = null;
+//            t.setText("ok stop ");
+        } catch (Exception e) {
+            e.printStackTrace();
+//            t.setText("fail stop " + e.getMessage());
+        }
+
+        isPlaying = false;
+
+    }
+
+    public void play() {
+
+        if (isPlaying) {
+            return;
+        }
+
+        FileInputStream fis = null;
+        try {
+
+            fis = new FileInputStream(filePath);
+            mediaPlayer.setDataSource(fis.getFD());
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            //mediaPlayer.setDataSource(filePath);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+
+            //observer = new MediaObserver();
+            //mediaPlayer.start();
+            //new Thread(observer).start();
+
+            isPlaying = true;
+
+
+        } catch (IOException e) {
+            //t.setText("fail play " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException ignore) {
+                }
+            }
+
+        }
     }
 
 }

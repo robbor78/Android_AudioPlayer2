@@ -22,4 +22,56 @@
             android:text=""
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+    <Button
+            android:id="@+id/play"
+            android:text="P"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:onClick="play"/>
+
+    <Button
+            android:id="@+id/pause"
+            android:text="||"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:onClick="pause"
+            android:enabled="false"/>
+
+    <Button
+            android:id="@+id/back"
+            android:text="&lt;"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:onClick="back"
+            android:enabled="false"
+    />
+
+    <Button
+            android:id="@+id/fwd"
+            android:text="&gt;"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:onClick="fwd"
+            android:enabled="true"
+    />
+
+    <Button
+            android:id="@+id/bback"
+            android:text="&lt;&lt;"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:onClick="bback"
+            android:enabled="false"
+    />
+
+    <Button
+            android:id="@+id/ffwd"
+            android:text="&gt;&gt;"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:onClick="ffwd"
+            android:enabled="true"
+    />
+
 </LinearLayout>

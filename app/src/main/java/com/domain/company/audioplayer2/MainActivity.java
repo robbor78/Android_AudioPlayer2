@@ -8,6 +8,7 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -17,6 +18,40 @@ public class MainActivity extends Activity {
     private Intent intent;
     private PlayerService mService;
     private boolean mBound = false;
+
+    public void back(View view) {
+//        seek(-5000);
+//        isBacking = true;
+    }
+
+    public void fwd(View view) {
+//        if (!isPlaying) {
+//            startPlay();
+//        }
+//        seek(5000);
+//        isForward = true;
+    }
+
+    public void bback(View view) {
+//        seek(-60000);
+//        isBBacking = true;
+    }
+
+    public void ffwd(View view) {
+//        if (!isPlaying) {
+//            startPlay();
+//        }
+//        seek(60000);
+//        isFForward = true;
+    }
+
+    public void play(View view) {
+
+
+        mService.toggle();
+
+    }
+
 
 
     @Override
