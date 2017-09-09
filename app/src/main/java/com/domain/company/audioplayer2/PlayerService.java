@@ -66,10 +66,12 @@ public class PlayerService extends IntentService {
         isPause = false;
         filePath = intent.getStringExtra("FilePath");
 
+        Log.d(TAG, "creating mp");
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete(MediaPlayer mp) {
+                Log.d(TAG, "seek complete");
                 serviceCallbacks.seekComplete();
             }
         });
@@ -155,6 +157,24 @@ public class PlayerService extends IntentService {
         }
     }
 
+    private void playOrUnpause() {
+        if (isPlaying) {
+            if (isPause) {
+                togglePause();
+            }
+        } else {
+            togglePlay();
+        }
+    }
+
+    private void unpause() {
+        if (isPlaying) {
+            if (isPause) {
+                togglePause();
+            }
+        }
+    }
+
     public void stop() {
 
 
@@ -220,19 +240,35 @@ public class PlayerService extends IntentService {
         }
     }
 
+    public void update() {
+        if (isPlaying) {
+            if (isPause) {
+                serviceCallbacks.paused();
+            } else {
+                serviceCallbacks.playing();
+            }
+        } else {
+            serviceCallbacks.stopped();
+        }
+    }
+
     public void back() {
+        unpause();
         seek(-5000);
     }
 
     public void forward() {
+        playOrUnpause();
         seek(5000);
     }
 
     public void bback() {
+        unpause();
         seek(-60000);
     }
 
     public void ffwd() {
+        playOrUnpause();
         seek(60000);
     }
 
@@ -250,9 +286,11 @@ public class PlayerService extends IntentService {
             return;
         }
 
+        if (isPause) {return;}
+
         PlayerInfo pi = new PlayerInfo();
         pi.filePath = filePath;
-        if (mediaPlayer.isPlaying()){
+        if (mediaPlayer.isPlaying()) {
             pi.duration = mediaPlayer.getDuration();
             pi.position = mediaPlayer.getCurrentPosition();
         }

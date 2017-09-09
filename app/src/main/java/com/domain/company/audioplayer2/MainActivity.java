@@ -23,14 +23,14 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     private boolean mBound = false;
 
     public void back(View view) {
-        toggle(false,true);
+        //toggle(false,true);
         mService.back();
 //        seek(-5000);
 //        isBacking = true;
     }
 
     public void fwd(View view) {
-        toggle(false,true);
+        //toggle(false,true);
         mService.forward();
 //        if (!isPlaying) {
 //            startPlay();
@@ -40,14 +40,14 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     }
 
     public void bback(View view) {
-        toggle(false,true);
+        //toggle(false,true);
         mService.bback();
 //        seek(-60000);
 //        isBBacking = true;
     }
 
     public void ffwd(View view) {
-        toggle(false,true);
+        //toggle(false,true);
         mService.ffwd();
 //        if (!isPlaying) {
 //            startPlay();
@@ -83,7 +83,6 @@ public class MainActivity extends Activity implements ServiceCallbacks {
 
         } else {
             Log.d(TAG, "onCreate no intent");
-
         }
 
     }
@@ -170,6 +169,9 @@ public class MainActivity extends Activity implements ServiceCallbacks {
             filePath = mService.getFilePath();
             TextView t = (TextView) findViewById(R.id.tvInfo);
             t.setText(filePath);
+            play(null);
+            mService.update();
+
         }
 
         @Override
@@ -181,7 +183,10 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     @Override
     public void info(PlayerInfo pi) {
         final TextView t = (TextView) findViewById(R.id.tvInfo);
-        double per = 100 * (double) pi.position / (double) pi.duration;
+        double per = 0.0;
+        if (pi.duration != 0) {
+            per = 100 * (double) pi.position / (double) pi.duration;
+        }
         int curr = pi.position / 1000;
         int total = pi.duration / 1000;
         String name = new File(pi.filePath).getName();
@@ -200,7 +205,7 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG,"seekComplete");
+                Log.d(TAG, "seekComplete");
                 toggle(true, true);
             }
         });
@@ -230,12 +235,56 @@ public class MainActivity extends Activity implements ServiceCallbacks {
 
     @Override
     public void paused() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Button b = (Button) findViewById(R.id.back);
+                b.setEnabled(true);
 
+                b = (Button) findViewById(R.id.bback);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.fwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.ffwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.pause);
+                b.setEnabled(true);
+                b.setText("-->");
+
+                b = (Button) findViewById(R.id.play);
+                b.setText("S");
+            }
+        });
     }
 
     @Override
     public void unpaused() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Button b = (Button) findViewById(R.id.back);
+                b.setEnabled(true);
 
+                b = (Button) findViewById(R.id.bback);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.fwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.ffwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.pause);
+                b.setEnabled(true);
+                b.setText("||");
+
+                b = (Button) findViewById(R.id.play);
+                b.setText("S");
+            }
+        });
     }
 
     private void toggle(boolean v, boolean all) {
