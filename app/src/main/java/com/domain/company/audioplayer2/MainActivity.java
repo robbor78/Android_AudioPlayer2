@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+import java.io.File;
+
+public class MainActivity extends Activity implements ServiceCallbacks {
 
     private static final String TAG = "MainActivity";
     private String filePath;
@@ -20,11 +23,15 @@ public class MainActivity extends Activity {
     private boolean mBound = false;
 
     public void back(View view) {
+        toggle(false,true);
+        mService.back();
 //        seek(-5000);
 //        isBacking = true;
     }
 
     public void fwd(View view) {
+        toggle(false,true);
+        mService.forward();
 //        if (!isPlaying) {
 //            startPlay();
 //        }
@@ -33,11 +40,15 @@ public class MainActivity extends Activity {
     }
 
     public void bback(View view) {
+        toggle(false,true);
+        mService.bback();
 //        seek(-60000);
 //        isBBacking = true;
     }
 
     public void ffwd(View view) {
+        toggle(false,true);
+        mService.ffwd();
 //        if (!isPlaying) {
 //            startPlay();
 //        }
@@ -46,17 +57,17 @@ public class MainActivity extends Activity {
     }
 
     public void play(View view) {
-
-
-        mService.toggle();
-
+        mService.togglePlay();
     }
 
+    public void pause(View view) {
+        mService.togglePause();
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate called "+savedInstanceState);
+        Log.d(TAG, "onCreate called " + savedInstanceState);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -115,7 +126,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString("FilePath",filePath);
+        savedInstanceState.putString("FilePath", filePath);
         Log.d(TAG, "onSaveInstanceState");
     }
 
@@ -128,13 +139,13 @@ public class MainActivity extends Activity {
         t.setText(filePath);
 
 
-
     }
 
     private void startService(String filePath) {
         intent = new Intent(this, PlayerService.class);
 
         try {
+            Log.d(TAG, "stopping existing service");
             stopService(intent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,6 +164,7 @@ public class MainActivity extends Activity {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
             mService = binder.getService();
+            mService.setCallbacks(MainActivity.this);
             mBound = true;
 
             filePath = mService.getFilePath();
@@ -166,4 +178,86 @@ public class MainActivity extends Activity {
         }
     };
 
+    @Override
+    public void info(PlayerInfo pi) {
+        final TextView t = (TextView) findViewById(R.id.tvInfo);
+        double per = 100 * (double) pi.position / (double) pi.duration;
+        int curr = pi.position / 1000;
+        int total = pi.duration / 1000;
+        String name = new File(pi.filePath).getName();
+        final String i = String.format("%s %.2f%% %d/%d", name, per, curr, total);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                t.setText(i);
+
+            }
+        });
+    }
+
+    @Override
+    public void seekComplete() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d(TAG,"seekComplete");
+                toggle(true, true);
+            }
+        });
+    }
+
+    @Override
+    public void stopped() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toggle(false, false);
+            }
+        });
+
+    }
+
+    @Override
+    public void playing() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                toggle(true, true);
+
+            }
+        });
+    }
+
+    @Override
+    public void paused() {
+
+    }
+
+    @Override
+    public void unpaused() {
+
+    }
+
+    private void toggle(boolean v, boolean all) {
+        Button b = (Button) findViewById(R.id.back);
+        b.setEnabled(v);
+
+        b = (Button) findViewById(R.id.bback);
+        b.setEnabled(v);
+
+        if (all) {
+            b = (Button) findViewById(R.id.fwd);
+            b.setEnabled(v);
+
+            b = (Button) findViewById(R.id.ffwd);
+            b.setEnabled(v);
+        }
+
+        b = (Button) findViewById(R.id.pause);
+        b.setEnabled(v);
+
+        b = (Button) findViewById(R.id.play);
+        b.setText(v ? "S" : "P");
+
+    }
 }

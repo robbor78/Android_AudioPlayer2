@@ -21,8 +21,10 @@ public class PlayerService extends IntentService {
 
     private boolean stop = false;
     private boolean isPlaying = false;
+    private boolean isPause = false;
     private String filePath;
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private MediaPlayer mediaPlayer = null;
+    private ServiceCallbacks serviceCallbacks = null;
 
     // Binder given to clients
     private final IBinder mBinder = new PlayerService.LocalBinder();
@@ -60,7 +62,24 @@ public class PlayerService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         stop = false;
+        isPlaying = false;
+        isPause = false;
         filePath = intent.getStringExtra("FilePath");
+
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(MediaPlayer mp) {
+                serviceCallbacks.seekComplete();
+            }
+        });
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+            @Override
+            public void onCompletion(MediaPlayer mPlayer) {
+                stop();
+            }
+        });
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
@@ -84,8 +103,11 @@ public class PlayerService extends IntentService {
 
         try {
             while (!stop) {
-                Log.d(TAG, "handling intent... " + filePath);
-                Thread.sleep(10000);
+                //Log.d(TAG, "handling intent... " + filePath);
+
+                info();
+
+                Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
             // Restore interrupt status.
@@ -95,6 +117,7 @@ public class PlayerService extends IntentService {
 
         try {
             stop();
+            info();
             mediaPlayer.release();
         } finally {
             mediaPlayer = null;
@@ -111,11 +134,24 @@ public class PlayerService extends IntentService {
         return filePath;
     }
 
-    public void toggle() {
+    public void togglePlay() {
         if (isPlaying) {
             stop();
         } else {
             play();
+        }
+    }
+
+    public void togglePause() {
+        if (isPlaying) {
+            if (isPause) {
+                mediaPlayer.start();
+                serviceCallbacks.unpaused();
+            } else {
+                mediaPlayer.pause();
+                serviceCallbacks.paused();
+            }
+            isPause = !isPause;
         }
     }
 
@@ -138,6 +174,8 @@ public class PlayerService extends IntentService {
         }
 
         isPlaying = false;
+        isPause = false;
+        serviceCallbacks.stopped();
 
     }
 
@@ -164,6 +202,8 @@ public class PlayerService extends IntentService {
             //new Thread(observer).start();
 
             isPlaying = true;
+            isPause = false;
+            serviceCallbacks.playing();
 
 
         } catch (IOException e) {
@@ -178,6 +218,46 @@ public class PlayerService extends IntentService {
             }
 
         }
+    }
+
+    public void back() {
+        seek(-5000);
+    }
+
+    public void forward() {
+        seek(5000);
+    }
+
+    public void bback() {
+        seek(-60000);
+    }
+
+    public void ffwd() {
+        seek(60000);
+    }
+
+    private void seek(int delta) {
+        int np = mediaPlayer.getCurrentPosition() + delta;
+        mediaPlayer.seekTo(np);
+    }
+
+    public void setCallbacks(ServiceCallbacks callbacks) {
+        serviceCallbacks = callbacks;
+    }
+
+    private void info() {
+        if (serviceCallbacks == null) {
+            return;
+        }
+
+        PlayerInfo pi = new PlayerInfo();
+        pi.filePath = filePath;
+        if (mediaPlayer.isPlaying()){
+            pi.duration = mediaPlayer.getDuration();
+            pi.position = mediaPlayer.getCurrentPosition();
+        }
+
+        serviceCallbacks.info(pi);
     }
 
 }
