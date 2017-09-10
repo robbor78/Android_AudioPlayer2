@@ -3,12 +3,15 @@ package com.domain.company.audioplayer2;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -61,70 +64,115 @@ public class PlayerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        stop = false;
-        isPlaying = false;
-        isPause = false;
-        filePath = intent.getStringExtra("FilePath");
+        String action = (String) intent.getExtras().get("DO");
+        if (action == null) {
 
-        Log.d(TAG, "creating mp");
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
-            @Override
-            public void onSeekComplete(MediaPlayer mp) {
-                Log.d(TAG, "seek complete");
-                serviceCallbacks.seekComplete();
+            Log.d(TAG, "no intent / default");
+
+
+            stop = false;
+            isPlaying = false;
+            isPause = false;
+            filePath = intent.getStringExtra("FilePath");
+
+            Log.d(TAG, "creating mp");
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+                @Override
+                public void onSeekComplete(MediaPlayer mp) {
+                    Log.d(TAG, "seek complete");
+                    serviceCallbacks.seekComplete();
+                }
+            });
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                @Override
+                public void onCompletion(MediaPlayer mPlayer) {
+                    Log.d(TAG, "play complete");
+                    stop();
+                }
+            });
+
+            Intent notificationIntent = new Intent(this, MainActivity.class);
+            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP);//FLAG_ACTIVITY_NEW_TASK);
+            notificationIntent.putExtra("FilePath", filePath);
+            PendingIntent pendingIntent =
+                    PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+            Notification notification =
+                    new Notification.Builder(this)
+                            .setContentTitle("AP2 Playing")
+                            .setContentText(filePath)
+                            .setSmallIcon(R.drawable.notification_icon)
+                            //.setContentIntent(pendingIntent)
+                            .setTicker(getText(R.string.ticker_text))
+                            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                            .setOngoing(true)
+                            .build();
+
+            RemoteViews rv = new RemoteViews(getBaseContext().getPackageName(), R.layout.notification_layout);
+            setListeners(rv);
+
+            notification.contentView = rv;
+
+
+            startForeground(ONGOING_NOTIFICATION_ID, notification);
+
+            try {
+                while (!stop) {
+                    //Log.d(TAG, "handling intent... " + filePath);
+
+                    info();
+
+                    Thread.sleep(1000);
+                }
+            } catch (InterruptedException e) {
+                // Restore interrupt status.
+                Thread.currentThread().interrupt();
             }
-        });
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
-            @Override
-            public void onCompletion(MediaPlayer mPlayer) {
-                Log.d(TAG, "play complete");
+
+            try {
                 stop();
-            }
-        });
-
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_SINGLE_TOP |
-                Intent.FLAG_ACTIVITY_CLEAR_TOP);//FLAG_ACTIVITY_NEW_TASK);
-        notificationIntent.putExtra("FilePath", filePath);
-        PendingIntent pendingIntent =
-                PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-
-        Notification notification =
-                new Notification.Builder(this)
-                        .setContentTitle("AP2 Playing")
-                        .setContentText(filePath)
-                        .setSmallIcon(R.drawable.notification_icon)
-                        .setContentIntent(pendingIntent)
-                        .setTicker(getText(R.string.ticker_text))
-                        .build();
-
-        startForeground(ONGOING_NOTIFICATION_ID, notification);
-
-        try {
-            while (!stop) {
-                //Log.d(TAG, "handling intent... " + filePath);
-
                 info();
-
-                Thread.sleep(1000);
+                mediaPlayer.release();
+            } finally {
+                mediaPlayer = null;
             }
-        } catch (InterruptedException e) {
-            // Restore interrupt status.
-            Thread.currentThread().interrupt();
+        } else if (action.equals("play")) {
+            Log.d(TAG, "intent play");
+        } else if (action.equals("back")) {
+            Log.d(TAG, "intent back");
+        } else if (action.equals("fwd")) {
+            Log.d(TAG, "intent fwd");
+
         }
+    }
 
 
-        try {
-            stop();
-            info();
-            mediaPlayer.release();
-        } finally {
-            mediaPlayer = null;
-        }
+    private void setListeners(RemoteViews rv) {
+        Context ctx = getBaseContext();
+
+        Intent playPause = new Intent(ctx, PlayerService.class);
+        playPause.putExtra("DO", "playPause");
+        playPause.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pPlayPause = PendingIntent.getActivity(ctx, 0, playPause, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.play, pPlayPause);
+
+        Intent back = new Intent(ctx, PlayerService.class);
+        back.putExtra("DO", "back");
+        back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pBack = PendingIntent.getActivity(ctx, 0, back, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.back, pBack);
+
+        Intent fwd = new Intent(ctx, PlayerService.class);
+        fwd.putExtra("DO", "fwd");
+        fwd.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pFwd = PendingIntent.getActivity(ctx, 0, fwd, PendingIntent.FLAG_UPDATE_CURRENT);
+        rv.setOnClickPendingIntent(R.id.fwd, pFwd);
 
     }
 
@@ -287,7 +335,9 @@ public class PlayerService extends IntentService {
             return;
         }
 
-        if (isPause) {return;}
+        if (isPause) {
+            return;
+        }
 
         PlayerInfo pi = new PlayerInfo();
         pi.filePath = filePath;

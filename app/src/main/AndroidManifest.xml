@@ -4,7 +4,7 @@
 
     <uses-sdk
             android:minSdkVersion="8"
-            android:targetSdkVersion="17"/>
+            android:targetSdkVersion="21"/>
 
     <application
             android:allowBackup="true"
@@ -30,7 +30,9 @@
 
         </activity>
 
-        <service android:name=".PlayerService"/>
+        <service android:name="com.domain.company.audioplayer2.PlayerService"
+                 android:exported="false"/>
+
 
     </application>
 

@@ -23,6 +23,7 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     private boolean mBound = false;
 
     public void back(View view) {
+
         //toggle(false,true);
         mService.back();
 //        seek(-5000);
@@ -71,6 +72,13 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        try {
+            String action = (String) getIntent().getExtras().get("DO");
+            Log.d(TAG, "action= "+action);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             filePath = getIntent().getData().getPath();
 
@@ -82,6 +90,7 @@ public class MainActivity extends Activity implements ServiceCallbacks {
             startService(filePath);
 
         } else {
+
             Log.d(TAG, "onCreate no intent");
         }
 
@@ -136,8 +145,6 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         filePath = intent.getStringExtra("FilePath");
         TextView t = (TextView) findViewById(R.id.tvInfo);
         t.setText(filePath);
-
-
     }
 
     private void startService(String filePath) {

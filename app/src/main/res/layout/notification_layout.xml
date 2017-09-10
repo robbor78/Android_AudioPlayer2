@@ -6,7 +6,7 @@
     <TextView
             android:id="@+id/info"
             android:layout_width="match_parent"
-            android:layout_height="41dp"
+            android:layout_height="30dp"
             android:text="..."/>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -17,21 +17,21 @@
 
         <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="41dp"
-                android:layout_height="41dp"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
                 android:text="P"
                 android:id="@+id/play"/>
         <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="41dp"
-                android:layout_height="41dp"
-                android:text="<"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:text="&lt;"
                 android:id="@+id/back"/>
         <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="41dp"
-                android:layout_height="41dp"
-                android:text="<"
+                android:layout_width="80dp"
+                android:layout_height="30dp"
+                android:text="&gt;"
                 android:id="@+id/fwd"/>
     </LinearLayout>
 </LinearLayout>
