@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="100px"
             android:onClick="pause"
-            android:enabled="false"/>
+            android:enabled="true"/>
 
     <Button
             android:id="@+id/back"
@@ -44,7 +44,7 @@
             android:layout_width="match_parent"
             android:layout_height="100px"
             android:onClick="back"
-            android:enabled="false"
+            android:enabled="true"
     />
 
     <Button
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="100px"
             android:onClick="bback"
-            android:enabled="false"
+            android:enabled="true"
     />
 
     <Button

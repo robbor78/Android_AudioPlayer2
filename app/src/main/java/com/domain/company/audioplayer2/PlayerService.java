@@ -79,6 +79,7 @@ public class PlayerService extends IntentService {
 
             @Override
             public void onCompletion(MediaPlayer mPlayer) {
+                Log.d(TAG, "play complete");
                 stop();
             }
         });

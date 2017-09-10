@@ -169,7 +169,7 @@ public class MainActivity extends Activity implements ServiceCallbacks {
             filePath = mService.getFilePath();
             TextView t = (TextView) findViewById(R.id.tvInfo);
             t.setText(filePath);
-            play(null);
+            mService.play();
             mService.update();
 
         }
@@ -288,25 +288,25 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     }
 
     private void toggle(boolean v, boolean all) {
-        Button b = (Button) findViewById(R.id.back);
-        b.setEnabled(v);
-
-        b = (Button) findViewById(R.id.bback);
-        b.setEnabled(v);
-
-        if (all) {
-            b = (Button) findViewById(R.id.fwd);
-            b.setEnabled(v);
-
-            b = (Button) findViewById(R.id.ffwd);
-            b.setEnabled(v);
-        }
-
-        b = (Button) findViewById(R.id.pause);
-        b.setEnabled(v);
-
-        b = (Button) findViewById(R.id.play);
-        b.setText(v ? "S" : "P");
+//        Button b = (Button) findViewById(R.id.back);
+//        b.setEnabled(v);
+//
+//        b = (Button) findViewById(R.id.bback);
+//        b.setEnabled(v);
+//
+//        if (all) {
+//            b = (Button) findViewById(R.id.fwd);
+//            b.setEnabled(v);
+//
+//            b = (Button) findViewById(R.id.ffwd);
+//            b.setEnabled(v);
+//        }
+//
+//        b = (Button) findViewById(R.id.pause);
+//        b.setEnabled(v);
+//
+//        b = (Button) findViewById(R.id.play);
+//        b.setText(v ? "S" : "P");
 
     }
 }
