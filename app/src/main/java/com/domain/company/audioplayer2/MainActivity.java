@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import java.io.File;
 
@@ -139,14 +138,9 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private void setup() {
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             filePath = getIntent().getData().getPath();
-
-            TextView t = (TextView) findViewById(R.id.tvInfo);
-            t.setText(filePath);
-
             Log.d(TAG, "onCreate: " + filePath);
-
+            setTitle(filePath);
             startService(filePath);
-
         } else {
 
             Log.d(TAG, "onCreate no intent");
@@ -224,8 +218,11 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     public void onNewIntent(Intent intent) {
         Log.d(TAG, "received new intent...");
         filePath = intent.getStringExtra("FilePath");
-        TextView t = (TextView) findViewById(R.id.tvInfo);
-        t.setText(filePath);
+        setTitle(filePath);
+    }
+
+    private void setTitle(String filePath) {
+        getSupportActionBar().setTitle(new File(filePath).getName());
     }
 
     private void startService(String filePath) {
@@ -249,8 +246,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             mBound = true;
 
             filePath = mService.getFilePath();
-            TextView t = (TextView) findViewById(R.id.tvInfo);
-            t.setText(filePath);
+            setTitle(filePath);
             mService.play();
             mService.update();
 
@@ -266,19 +262,19 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
     @Override
     public void info(PlayerInfo pi) {
-        final TextView t = (TextView) findViewById(R.id.tvInfo);
         double per = 0.0;
         if (pi.duration != 0) {
             per = 100 * (double) pi.position / (double) pi.duration;
         }
         int curr = pi.position / 1000;
         int total = pi.duration / 1000;
-        String name = new File(pi.filePath).getName();
-        final String i = String.format("%s %.2f%% %d/%d", name, per, curr, total);
+        final String title = new File(pi.filePath).getName();
+        final String subTitle = String.format("%.2f%% %d/%d", per, curr, total);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                t.setText(i);
+                getSupportActionBar().setTitle(title);
+                getSupportActionBar().setSubtitle(subTitle);
 
             }
         });

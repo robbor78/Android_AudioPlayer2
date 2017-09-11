@@ -11,19 +11,6 @@
         tools:context="com.domain.company.audioplayer2.MainActivity"
         android:orientation="vertical">
 
-
-    <TextView
-            android:id="@+id/tvHeader"
-            android:text="Welcome to Audio Player 2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-    <TextView
-            android:id="@+id/tvInfo"
-            android:text=""
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
     <Button
             android:id="@+id/play"
             android:text="P"
