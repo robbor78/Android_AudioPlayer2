@@ -133,19 +133,27 @@ public class PlayerService extends IntentService {
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, NOT_REQ_ACT, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        mBuilder = new Notification.Builder(this);
-        Notification notification = mBuilder
-                .setContentTitle("AP2 Playing")
-                .setContentText(filePath)
-                .setSmallIcon(R.drawable.notification_icon)
-                .setContentIntent(pendingIntent)
-                .setTicker(getText(R.string.ticker_text))
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setOngoing(true)
-                .build();
-
         rv = new RemoteViews(getBaseContext().getPackageName(), R.layout.notification_layout);
         setListeners(rv);
+
+        mBuilder = new Notification.Builder(this);
+//        Notification notification = mBuilder
+//                .setContentTitle("AP2 Playing")
+//                .setContentText(filePath)
+//                .setSmallIcon(R.drawable.notification_icon)
+//                .setContentIntent(pendingIntent)
+//                .setTicker(getText(R.string.ticker_text))
+//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+//                .setOngoing(true)
+//                .build();
+
+        Notification notification = mBuilder.setSmallIcon(R.drawable.notification_icon)
+                .setAutoCancel(false)
+                .setOngoing(true)
+                .setContentIntent(pendingIntent)
+                .setContent(rv)
+                .build();
+
 
         notification.contentView = rv;
 
