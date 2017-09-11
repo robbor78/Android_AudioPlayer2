@@ -10,7 +10,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -35,18 +34,13 @@ public class PlayerService extends IntentService {
     private NotificationManager mNotificationManager = null;
     private Notification.Builder mBuilder = null;
     private RemoteViews rv = null;
-
-    // Binder given to clients
     private final IBinder mBinder = new PlayerService.LocalBinder();
-
 
     public class LocalBinder extends Binder {
         PlayerService getService() {
-            // Return this instance of LocalService so clients can call public methods
             return PlayerService.this;
         }
     }
-
 
     public PlayerService() {
         super("PlayerService");
@@ -54,22 +48,26 @@ public class PlayerService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "PlayerService player starting... " + this);
+        Log.d(TAG, "PlayerService player starting... " + intent + " " + this);
         String action = (String) intent.getExtras().get("DO");
         Log.d(TAG, "action= " + action);
-        if (action != null) {
-            if (action.equals("playPause")) {
-                Log.d(TAG, "intent play");
-                togglePlay();
-            } else if (action.equals("back")) {
-                Log.d(TAG, "intent back");
-                back();
-            } else if (action.equals("fwd")) {
-                Log.d(TAG, "intent fwd");
-                forward();
-            }
+        if (action!=null) {
+            handleIntent(intent);
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        Log.d(TAG, "PlayerService onHandleIntent " + intent + " " + this);
+        handleIntent(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "Player Service onDestroy");
+        super.onDestroy();
+        stop = true;
     }
 
     private void handleIntent(Intent intent) {
@@ -80,10 +78,13 @@ public class PlayerService extends IntentService {
             handleStartup(intent);
         } else if (action.equals("playPause")) {
             Log.d(TAG, "intent play");
+            playOrTogglePause();
         } else if (action.equals("back")) {
             Log.d(TAG, "intent back");
+            back();
         } else if (action.equals("fwd")) {
             Log.d(TAG, "intent fwd");
+            forward();
         }
     }
 
@@ -91,19 +92,14 @@ public class PlayerService extends IntentService {
         stop = false;
         isPlaying = false;
         isPause = false;
-
         filePath = intent.getStringExtra(MainActivity.EXTRA_KEY_FILEPATH);
-
         wireUpPlayer();
-
         setupNotification();
-
         loop();
-
     }
 
     private void wireUpPlayer() {
-        Log.d(TAG, "creating mp");
+        Log.d(TAG, "creating mp...");
         mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
             @Override
             public void onSeekComplete(MediaPlayer mp) {
@@ -119,6 +115,7 @@ public class PlayerService extends IntentService {
                 stop();
             }
         });
+        Log.d(TAG, "creating mp end.");
     }
 
     private void setupNotification() {
@@ -146,7 +143,7 @@ public class PlayerService extends IntentService {
                 .build();
 
 
-        notification.contentView = rv;
+//        notification.contentView = rv;
 
         startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
@@ -154,7 +151,7 @@ public class PlayerService extends IntentService {
     private void loop() {
         try {
             while (!stop) {
-                info();
+                updateInfo();
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
@@ -162,31 +159,14 @@ public class PlayerService extends IntentService {
             Thread.currentThread().interrupt();
         }
 
-
         try {
             stop();
-            info();
+            updateInfo();
             mediaPlayer.release();
         } finally {
             mediaPlayer = null;
         }
     }
-
-    @Override
-    public void onDestroy() {
-        // The service is no longer used and is being destroyed
-        Log.d(TAG, "Player Service onDestroy");
-        super.onDestroy();
-        stop = true;
-    }
-
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Log.d(TAG, "PlayerService onHandleIntent " + intent + " " + this);
-        handleIntent(intent);
-    }
-
 
     private void setListeners(RemoteViews rv) {
         Context ctx = getBaseContext();
@@ -195,19 +175,19 @@ public class PlayerService extends IntentService {
         playPause.putExtra("DO", "playPause");
         playPause.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pPlayPause = PendingIntent.getService(ctx, NOT_REQ_PLAY, playPause, PendingIntent.FLAG_UPDATE_CURRENT);
-        //rv.setOnClickPendingIntent(R.id.not_play, pPlayPause);
+        rv.setOnClickPendingIntent(R.id.not_play, pPlayPause);
 
         Intent back = new Intent(ctx, PlayerService.class);
         back.putExtra("DO", "back");
         back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pBack = PendingIntent.getService(ctx, NOT_REQ_BACK, back, PendingIntent.FLAG_UPDATE_CURRENT);
-        //rv.setOnClickPendingIntent(R.id.not_back, pBack);
+        rv.setOnClickPendingIntent(R.id.not_back, pBack);
 
         Intent fwd = new Intent(ctx, PlayerService.class);
         fwd.putExtra("DO", "fwd");
         fwd.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pFwd = PendingIntent.getService(ctx, NOT_REQ_FWD, fwd, PendingIntent.FLAG_UPDATE_CURRENT);
-        //rv.setOnClickPendingIntent(R.id.not_fwd, pFwd);
+        rv.setOnClickPendingIntent(R.id.not_fwd, pFwd);
 
     }
 
@@ -216,6 +196,9 @@ public class PlayerService extends IntentService {
         return mBinder;
     }
 
+    public void setCallbacks(ServiceCallbacks callbacks) {
+        serviceCallbacks = callbacks;
+    }
 
     public String getFilePath() {
         return filePath;
@@ -239,84 +222,6 @@ public class PlayerService extends IntentService {
                 serviceCallbacks.paused();
             }
             isPause = !isPause;
-        }
-    }
-
-    private void playOrUnpause() {
-        if (isPlaying) {
-            if (isPause) {
-                togglePause();
-            }
-        } else {
-            togglePlay();
-        }
-    }
-
-    private void unpause() {
-        if (isPlaying) {
-            if (isPause) {
-                togglePause();
-            }
-        }
-    }
-
-    public void stop() {
-
-
-        if (!isPlaying) {
-            return;
-        }
-
-        try {
-            mediaPlayer.stop();
-            mediaPlayer.reset();
-        } catch (Exception e) {
-            e.printStackTrace();
-//            t.setText("fail stop " + e.getMessage());
-        }
-
-        isPlaying = false;
-        isPause = false;
-        serviceCallbacks.stopped();
-
-    }
-
-    public void play() {
-
-        if (isPlaying) {
-            Log.d(TAG, "already playing ... nothing to do ... returining " + this);
-            return;
-        }
-
-
-        FileInputStream fis = null;
-        try {
-            Log.d(TAG, "init playing ... " + this);
-
-            fis = new FileInputStream(filePath);
-            mediaPlayer.setDataSource(fis.getFD());
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-
-            isPlaying = true;
-            isPause = false;
-            serviceCallbacks.playing();
-
-            Log.d(TAG, "init playing end");
-
-        } catch (IOException e) {
-            //t.setText("fail play " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException ignore) {
-                }
-            }
-
         }
     }
 
@@ -352,6 +257,82 @@ public class PlayerService extends IntentService {
         seek(60000);
     }
 
+    public void play() {
+
+        if (isPlaying) {
+            Log.d(TAG, "already playing ... nothing to do ... returining " + this);
+            return;
+        }
+
+        FileInputStream fis = null;
+        try {
+            Log.d(TAG, "init playing ... " + this);
+
+            fis = new FileInputStream(filePath);
+            mediaPlayer.setDataSource(fis.getFD());
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            isPlaying = true;
+            isPause = false;
+
+            Log.d(TAG, "init playing end");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException ignore) {
+                }
+            }
+        }
+    }
+
+    private void stop() {
+        if (!isPlaying) {
+            return;
+        }
+
+        try {
+            mediaPlayer.stop();
+            mediaPlayer.reset();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        isPlaying = false;
+        isPause = false;
+    }
+
+    private void playOrTogglePause() {
+        if (!isPlaying) {
+            play();
+        } else {
+            togglePause();
+        }
+    }
+
+    private void playOrUnpause() {
+        if (isPlaying) {
+            if (isPause) {
+                togglePause();
+            }
+        } else {
+            togglePlay();
+        }
+    }
+
+    private void unpause() {
+        if (isPlaying) {
+            if (isPause) {
+                togglePause();
+            }
+        }
+    }
+
     private void seek(int delta) {
         Log.d(TAG, "PlayerService seeking...");
         int np = mediaPlayer.getCurrentPosition() + delta;
@@ -359,35 +340,34 @@ public class PlayerService extends IntentService {
         Log.d(TAG, "PlayerService seeking end");
     }
 
-    public void setCallbacks(ServiceCallbacks callbacks) {
-        serviceCallbacks = callbacks;
-    }
-
-    private void info() {
+    private void updateInfo() {
         if (serviceCallbacks == null) {
             return;
         }
-
-        if (isPause) {
-            return;
+        PlayerInfo pi = getPlayerInfo();
+        updateNotification(pi);
+        if (!isPause) {
+            serviceCallbacks.info(pi);
         }
+    }
 
-
+    private PlayerInfo getPlayerInfo() {
         PlayerInfo pi = new PlayerInfo();
         pi.filePath = filePath;
         if (mediaPlayer.isPlaying()) {
             pi.duration = mediaPlayer.getDuration();
             pi.position = mediaPlayer.getCurrentPosition();
         }
+        return pi;
+    }
 
-        updateNotification(pi);
-        serviceCallbacks.info(pi);
+    private void updateNotification() {
+        updateNotification(getPlayerInfo());
     }
 
     private void updateNotification(PlayerInfo pi) {
         rv.setTextViewText(R.id.not_title, pi.getCombined());
         mNotificationManager.notify(ONGOING_NOTIFICATION_ID, mBuilder.build());
-
     }
 
 }

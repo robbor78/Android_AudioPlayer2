@@ -40,13 +40,13 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
         if (IsAlreadyRunning(savedInstanceState)) {
             Log.d(TAG, "Already running.");
             bindToLocalService();
         } else if (canReadExternalStorage()) {
+            Log.d(TAG, "new setup...");
             setup();
+            Log.d(TAG, "new setup end.");
         } else {
             requestPermissions(INITIAL_PERMS, INITIAL_REQUEST);
         }
@@ -76,23 +76,15 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_exit) {
             unbind();
             stopService();
             finish();
-
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
-
 
     private boolean canReadExternalStorage() {
         return (hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE));
@@ -136,9 +128,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
-
     }
-
 
     @Override
     protected void onPause() {
@@ -150,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop");
-
         unbind();
     }
 
@@ -192,7 +181,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         Log.d(TAG, "onSaveInstanceState");
     }
 
-
     @Override
     public void onNewIntent(Intent intent) {
         Log.d(TAG, "received new intent...");
@@ -218,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            Log.d(TAG, "onServiceConnected...");
             PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
             mService = binder.getService();
             mService.setCallbacks(MainActivity.this);
@@ -230,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             mService.update();
 
             Log.d(TAG, "service connected");
-
         }
 
         @Override
@@ -248,7 +235,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             public void run() {
                 getSupportActionBar().setTitle(title);
                 getSupportActionBar().setSubtitle(subTitle);
-
             }
         });
     }
@@ -289,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                 b.setText("P");
             }
         });
-
     }
 
     @Override
@@ -315,7 +300,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
                 b = (Button) findViewById(R.id.act_play);
                 b.setText("S");
-
             }
         });
     }
@@ -394,7 +378,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 //
 //        b = (Button) findViewById(R.id.play);
 //        b.setText(v ? "S" : "P");
-
     }
 
     public void play(View view) {
@@ -424,6 +407,5 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         //toggle(false,true);
         mService.ffwd();
     }
-
 
 }
