@@ -26,7 +26,7 @@ public class PlayerService extends IntentService {
     private boolean isPlaying = false;
     private boolean isPause = false;
     private String filePath;
-    private MediaPlayer mediaPlayer = null;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
     private ServiceCallbacks serviceCallbacks = null;
 
     // Binder given to clients
@@ -47,8 +47,8 @@ public class PlayerService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "player starting", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "player starting...");
+        Toast.makeText(this, "PlayerService player starting", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "PlayerService player starting... " + this);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -64,10 +64,12 @@ public class PlayerService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
+        Log.d(TAG, "PlayerService onHandleIntent " + intent + " " + this);
+
         String action = (String) intent.getExtras().get("DO");
         if (action == null) {
 
-            Log.d(TAG, "no intent / default");
+            Log.d(TAG, "PlayerService no intent / default");
 
 
             stop = false;
@@ -76,7 +78,7 @@ public class PlayerService extends IntentService {
             filePath = intent.getStringExtra("FilePath");
 
             Log.d(TAG, "creating mp");
-            mediaPlayer = new MediaPlayer();
+
             mediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
                 @Override
                 public void onSeekComplete(MediaPlayer mp) {
@@ -107,7 +109,7 @@ public class PlayerService extends IntentService {
                             .setContentTitle("AP2 Playing")
                             .setContentText(filePath)
                             .setSmallIcon(R.drawable.notification_icon)
-                            //.setContentIntent(pendingIntent)
+                            .setContentIntent(pendingIntent)
                             .setTicker(getText(R.string.ticker_text))
                             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                             .setOngoing(true)
@@ -181,6 +183,7 @@ public class PlayerService extends IntentService {
         return mBinder;
     }
 
+
     public String getFilePath() {
         return filePath;
     }
@@ -234,9 +237,6 @@ public class PlayerService extends IntentService {
         try {
             mediaPlayer.stop();
             mediaPlayer.reset();
-//            observer.stop();
-//            observer = null;
-//            t.setText("ok stop ");
         } catch (Exception e) {
             e.printStackTrace();
 //            t.setText("fail stop " + e.getMessage());
@@ -251,29 +251,27 @@ public class PlayerService extends IntentService {
     public void play() {
 
         if (isPlaying) {
+            Log.d(TAG, "already playing ... nothing to do ... returining " + this);
             return;
         }
 
+
         FileInputStream fis = null;
         try {
+            Log.d(TAG, "init playing ... " + this);
 
             fis = new FileInputStream(filePath);
             mediaPlayer.setDataSource(fis.getFD());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
-            //mediaPlayer.setDataSource(filePath);
             mediaPlayer.prepare();
             mediaPlayer.start();
-
-
-            //observer = new MediaObserver();
-            //mediaPlayer.start();
-            //new Thread(observer).start();
 
             isPlaying = true;
             isPause = false;
             serviceCallbacks.playing();
 
+            Log.d(TAG, "init playing end");
 
         } catch (IOException e) {
             //t.setText("fail play " + e.getMessage());
@@ -322,8 +320,10 @@ public class PlayerService extends IntentService {
     }
 
     private void seek(int delta) {
+        Log.d(TAG, "PlayerService seeking...");
         int np = mediaPlayer.getCurrentPosition() + delta;
         mediaPlayer.seekTo(np);
+        Log.d(TAG, "PlayerService seeking end");
     }
 
     public void setCallbacks(ServiceCallbacks callbacks) {

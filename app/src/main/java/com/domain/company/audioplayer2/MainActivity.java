@@ -8,6 +8,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -70,14 +73,10 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called " + savedInstanceState);
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
 
-        try {
-            String action = (String) getIntent().getExtras().get("DO");
-            Log.d(TAG, "action= "+action);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             filePath = getIntent().getData().getPath();
@@ -102,7 +101,9 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         Log.d(TAG, "onStart");
         // Bind to LocalService
         Intent intent = new Intent(this, PlayerService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "binding service... intent=" + intent);
+        boolean isBound = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "binding service end, isBound=" + isBound);
     }
 
 
@@ -119,7 +120,9 @@ public class MainActivity extends Activity implements ServiceCallbacks {
 
         // Unbind from the service
         if (mBound) {
-            unbindService(mConnection);
+            Log.d(TAG, "unbinding...");
+            //   unbindService(mConnection);
+            Log.d(TAG, "unbinding end");
             mBound = false;
         }
 
@@ -158,8 +161,9 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         }
 
         intent.putExtra("FilePath", filePath);
+        Log.d(TAG, "starting service... intent=" + intent);
         startService(intent);
-        Log.d(TAG, "starting service...");
+        Log.d(TAG, "starting service end");
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -178,6 +182,8 @@ public class MainActivity extends Activity implements ServiceCallbacks {
             t.setText(filePath);
             mService.play();
             mService.update();
+
+            Log.d(TAG, "service connected");
 
         }
 
@@ -315,5 +321,29 @@ public class MainActivity extends Activity implements ServiceCallbacks {
 //        b = (Button) findViewById(R.id.play);
 //        b.setText(v ? "S" : "P");
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        Log.d(TAG, "oncreateoptionsmenu");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // action with ID action_refresh was selected
+            case R.id.menu2_item1:
+//
+//
+                break;
+            default:
+                break;
+        }
+
+        return true;
     }
 }

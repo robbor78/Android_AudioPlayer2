@@ -11,6 +11,7 @@
         tools:context="com.domain.company.audioplayer2.MainActivity"
         android:orientation="vertical">
 
+
     <TextView
             android:id="@+id/tvHeader"
             android:text="Welcome to Audio Player 2"
@@ -73,5 +74,6 @@
             android:onClick="ffwd"
             android:enabled="true"
     />
+
 
 </LinearLayout>
