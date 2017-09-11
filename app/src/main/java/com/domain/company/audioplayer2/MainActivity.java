@@ -1,6 +1,7 @@
 package com.domain.company.audioplayer2;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -96,7 +97,17 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     private boolean IsAlreadyRunning(Bundle b) {
-        return b != null && !b.isEmpty() && b.getBoolean(SAVED_ISSTARTED);
+        return (b != null && !b.isEmpty() && b.getBoolean(SAVED_ISSTARTED)) || IsMyServiceRunning(PlayerService.class);
+    }
+
+    private boolean IsMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
