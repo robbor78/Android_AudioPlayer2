@@ -9,14 +9,18 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.File;
 
-public class MainActivity extends Activity implements ServiceCallbacks {
+public class MainActivity extends AppCompatActivity implements ServiceCallbacks {
 
     private static final String TAG = "MainActivity";
     private String filePath;
@@ -77,9 +81,9 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called " + savedInstanceState);
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
 
         if (canReadExternalStorage()) {
@@ -89,6 +93,33 @@ public class MainActivity extends Activity implements ServiceCallbacks {
             requestPermissions(INITIAL_PERMS, INITIAL_REQUEST);
         }
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_exit) {
+            finish();
+            //moveTaskToBack(true);
+            //android.os.Process.killProcess(android.os.Process.myPid());
+            //System.exit(1);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 

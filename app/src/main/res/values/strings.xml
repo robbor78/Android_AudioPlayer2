@@ -3,4 +3,5 @@
     <string name="notification_title">AP2</string>
     <string name="notification_message">playing</string>
     <string name="ticker_text">...</string>
+    <string name="action_exit">Exit</string>
 </resources>
