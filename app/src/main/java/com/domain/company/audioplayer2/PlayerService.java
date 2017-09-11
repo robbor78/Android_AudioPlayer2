@@ -137,15 +137,6 @@ public class PlayerService extends IntentService {
         setListeners(rv);
 
         mBuilder = new Notification.Builder(this);
-//        Notification notification = mBuilder
-//                .setContentTitle("AP2 Playing")
-//                .setContentText(filePath)
-//                .setSmallIcon(R.drawable.notification_icon)
-//                .setContentIntent(pendingIntent)
-//                .setTicker(getText(R.string.ticker_text))
-//                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//                .setOngoing(true)
-//                .build();
 
         Notification notification = mBuilder.setSmallIcon(R.drawable.notification_icon)
                 .setAutoCancel(false)
