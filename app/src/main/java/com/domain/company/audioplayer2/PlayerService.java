@@ -2,6 +2,7 @@ package com.domain.company.audioplayer2;
 
 import android.app.IntentService;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +13,6 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,11 +21,10 @@ public class PlayerService extends IntentService {
 
     private static final String TAG = "PlayerService";
     private static final int ONGOING_NOTIFICATION_ID = 1;
-    private static  final int NOT_REQ_ACT=20;
-    private static final int NOT_REQ_PLAY=30;
-    private static final int NOT_REQ_BACK=40;
-    private static final int NOT_REQ_FWD=50;
-
+    private static final int NOT_REQ_ACT = 20;
+    private static final int NOT_REQ_PLAY = 30;
+    private static final int NOT_REQ_BACK = 40;
+    private static final int NOT_REQ_FWD = 50;
 
     private boolean stop = false;
     private boolean isPlaying = false;
@@ -33,6 +32,9 @@ public class PlayerService extends IntentService {
     private String filePath;
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private ServiceCallbacks serviceCallbacks = null;
+    private NotificationManager mNotificationManager = null;
+    private Notification.Builder mBuilder = null;
+    private RemoteViews rv = null;
 
     // Binder given to clients
     private final IBinder mBinder = new PlayerService.LocalBinder();
@@ -120,6 +122,9 @@ public class PlayerService extends IntentService {
     }
 
     private void setupNotification() {
+
+        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP |
@@ -128,19 +133,18 @@ public class PlayerService extends IntentService {
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, NOT_REQ_ACT, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        mBuilder = new Notification.Builder(this);
+        Notification notification = mBuilder
+                .setContentTitle("AP2 Playing")
+                .setContentText(filePath)
+                .setSmallIcon(R.drawable.notification_icon)
+                .setContentIntent(pendingIntent)
+                .setTicker(getText(R.string.ticker_text))
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setOngoing(true)
+                .build();
 
-        Notification notification =
-                new Notification.Builder(this)
-                        .setContentTitle("AP2 Playing")
-                        .setContentText(filePath)
-                        .setSmallIcon(R.drawable.notification_icon)
-                        .setContentIntent(pendingIntent)
-                        .setTicker(getText(R.string.ticker_text))
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setOngoing(true)
-                        .build();
-
-        RemoteViews rv = new RemoteViews(getBaseContext().getPackageName(), R.layout.notification_layout);
+        rv = new RemoteViews(getBaseContext().getPackageName(), R.layout.notification_layout);
         setListeners(rv);
 
         notification.contentView = rv;
@@ -369,6 +373,7 @@ public class PlayerService extends IntentService {
             return;
         }
 
+
         PlayerInfo pi = new PlayerInfo();
         pi.filePath = filePath;
         if (mediaPlayer.isPlaying()) {
@@ -376,7 +381,14 @@ public class PlayerService extends IntentService {
             pi.position = mediaPlayer.getCurrentPosition();
         }
 
+        updateNotification(pi);
         serviceCallbacks.info(pi);
+    }
+
+    private void updateNotification(PlayerInfo pi) {
+        rv.setTextViewText(R.id.not_title, pi.getCombined());
+        mNotificationManager.notify(ONGOING_NOTIFICATION_ID, mBuilder.build());
+
     }
 
 }

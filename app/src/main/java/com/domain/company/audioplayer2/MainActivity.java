@@ -241,14 +241,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
     @Override
     public void info(PlayerInfo pi) {
-        double per = 0.0;
-        if (pi.duration != 0) {
-            per = 100 * (double) pi.position / (double) pi.duration;
-        }
-        int curr = pi.position / 1000;
-        int total = pi.duration / 1000;
-        final String title = new File(pi.filePath).getName();
-        final String subTitle = String.format("%.2f%% %d/%d", per, curr, total);
+        final String title = pi.getTitle();
+        final String subTitle = pi.getSubTitle();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
