@@ -229,7 +229,24 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                toggle(false, false);
+                Button b = (Button) findViewById(R.id.back);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.bback);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.fwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.ffwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.pause);
+                b.setEnabled(true);
+                b.setText("||");
+
+                b = (Button) findViewById(R.id.play);
+                b.setText("P");
             }
         });
 
@@ -240,7 +257,24 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                toggle(true, true);
+                Button b = (Button) findViewById(R.id.back);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.bback);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.fwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.ffwd);
+                b.setEnabled(true);
+
+                b = (Button) findViewById(R.id.pause);
+                b.setEnabled(true);
+                b.setText("||");
+
+                b = (Button) findViewById(R.id.play);
+                b.setText("S");
 
             }
         });
@@ -323,27 +357,6 @@ public class MainActivity extends Activity implements ServiceCallbacks {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        Log.d(TAG, "oncreateoptionsmenu");
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu2, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // action with ID action_refresh was selected
-            case R.id.menu2_item1:
-//
-//
-                break;
-            default:
-                break;
-        }
 
-        return true;
-    }
 }
