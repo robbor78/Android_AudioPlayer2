@@ -344,9 +344,9 @@ public class PlayerService extends IntentService {
         if (serviceCallbacks == null) {
             return;
         }
-        PlayerInfo pi = getPlayerInfo();
-        updateNotification(pi);
         if (!isPause) {
+            PlayerInfo pi = getPlayerInfo();
+            updateNotification(pi);
             serviceCallbacks.info(pi);
         }
     }
@@ -366,6 +366,13 @@ public class PlayerService extends IntentService {
     }
 
     private void updateNotification(PlayerInfo pi) {
+//        if (isPlaying) {
+//            rv.setString(R.id.not_play, "setText", "||" );
+//        } else if (isPause) {
+//            rv.setString(R.id.not_play, "setText", "-->");
+//        } else if (!isPlaying) {
+//            rv.setString(R.id.not_play, "setText", "P");
+//        }
         rv.setTextViewText(R.id.not_title, pi.getCombined());
         mNotificationManager.notify(ONGOING_NOTIFICATION_ID, mBuilder.build());
     }
