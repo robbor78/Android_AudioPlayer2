@@ -1,37 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/layout"
+                android:layout_width="fill_parent"
+                android:layout_height="64dp"
+                android:padding="1dp">
+
     <TextView
-            android:id="@+id/info"
+            android:textSize="10dp"
+            android:textColor="#000"
+            android:text="Testing"
+            android:id="@+id/not_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="0dp"
+    />
+    <!--android:layout_above="@+id/not_buttons"-->
+
+    <LinearLayout
+            android:id="@+id/not_buttons"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:text="..."/>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="horizontal"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
-
-
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_below="@+id/not_title"
+            android:padding="0dp">
         <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="80dp"
-                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="P"
-                android:id="@+id/play"/>
+                android:id="@+id/not_play"
+                android:padding="0dp"
+        />
+        <!---->
+        <!--android:layout_toLeftOf="@+id/not_back"-->
         <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="80dp"
-                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_below="@+id/not_title"
                 android:text="&lt;"
-                android:id="@+id/back"/>
+                android:id="@+id/not_back"
+                android:padding="0dp"
+        />
+        <!--android:layout_toLeftOf="@+id/not_fwd"-->
+        <!--android:layout_toRightOf="@+id/not_play"-->
         <Button
                 style="?android:attr/buttonStyleSmall"
-                android:layout_width="80dp"
-                android:layout_height="30dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_below="@+id/not_title"
                 android:text="&gt;"
-                android:id="@+id/fwd"/>
+                android:id="@+id/not_fwd"
+                android:padding="0dp"
+        />
+        <!--android:layout_toRightOf="@+id/not_back"-->
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

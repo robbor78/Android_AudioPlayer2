@@ -20,7 +20,7 @@
             android:layout_height="100px"
             android:orientation="horizontal">
         <Button
-                android:id="@+id/play"
+                android:id="@+id/act_play"
                 android:text="P"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
                 android:onClick="play"/>
 
         <Button
-                android:id="@+id/pause"
+                android:id="@+id/act_pause"
                 android:text="||"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -42,7 +42,7 @@
             android:layout_height="100px"
             android:orientation="horizontal">
         <Button
-                android:id="@+id/back"
+                android:id="@+id/act_back"
                 android:text="&lt;"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         />
 
         <Button
-                android:id="@+id/fwd"
+                android:id="@+id/act_fwd"
                 android:text="&gt;"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
             android:layout_height="100px"
             android:orientation="horizontal">
         <Button
-                android:id="@+id/bback"
+                android:id="@+id/act_bback"
                 android:text="&lt;&lt;"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
         />
 
         <Button
-                android:id="@+id/ffwd"
+                android:id="@+id/act_ffwd"
                 android:text="&gt;&gt;"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

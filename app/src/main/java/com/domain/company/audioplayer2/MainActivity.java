@@ -275,23 +275,23 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Button b = (Button) findViewById(R.id.back);
+                Button b = (Button) findViewById(R.id.act_back);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.bback);
+                b = (Button) findViewById(R.id.act_bback);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.fwd);
+                b = (Button) findViewById(R.id.act_fwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.ffwd);
+                b = (Button) findViewById(R.id.act_ffwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.pause);
+                b = (Button) findViewById(R.id.act_pause);
                 b.setEnabled(true);
                 b.setText("||");
 
-                b = (Button) findViewById(R.id.play);
+                b = (Button) findViewById(R.id.act_play);
                 b.setText("P");
             }
         });
@@ -303,23 +303,23 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Button b = (Button) findViewById(R.id.back);
+                Button b = (Button) findViewById(R.id.act_back);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.bback);
+                b = (Button) findViewById(R.id.act_bback);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.fwd);
+                b = (Button) findViewById(R.id.act_fwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.ffwd);
+                b = (Button) findViewById(R.id.act_ffwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.pause);
+                b = (Button) findViewById(R.id.act_pause);
                 b.setEnabled(true);
                 b.setText("||");
 
-                b = (Button) findViewById(R.id.play);
+                b = (Button) findViewById(R.id.act_play);
                 b.setText("S");
 
             }
@@ -331,23 +331,23 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Button b = (Button) findViewById(R.id.back);
+                Button b = (Button) findViewById(R.id.act_back);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.bback);
+                b = (Button) findViewById(R.id.act_bback);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.fwd);
+                b = (Button) findViewById(R.id.act_fwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.ffwd);
+                b = (Button) findViewById(R.id.act_ffwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.pause);
+                b = (Button) findViewById(R.id.act_pause);
                 b.setEnabled(true);
                 b.setText("-->");
 
-                b = (Button) findViewById(R.id.play);
+                b = (Button) findViewById(R.id.act_play);
                 b.setText("S");
             }
         });
@@ -358,23 +358,23 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Button b = (Button) findViewById(R.id.back);
+                Button b = (Button) findViewById(R.id.act_back);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.bback);
+                b = (Button) findViewById(R.id.act_bback);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.fwd);
+                b = (Button) findViewById(R.id.act_fwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.ffwd);
+                b = (Button) findViewById(R.id.act_ffwd);
                 b.setEnabled(true);
 
-                b = (Button) findViewById(R.id.pause);
+                b = (Button) findViewById(R.id.act_pause);
                 b.setEnabled(true);
                 b.setText("||");
 
-                b = (Button) findViewById(R.id.play);
+                b = (Button) findViewById(R.id.act_play);
                 b.setText("S");
             }
         });

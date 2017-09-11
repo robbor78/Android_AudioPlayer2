@@ -151,10 +151,7 @@ public class PlayerService extends IntentService {
     private void loop() {
         try {
             while (!stop) {
-                //Log.d(TAG, "handling intent... " + filePath);
-
                 info();
-
                 Thread.sleep(1000);
             }
         } catch (InterruptedException e) {
@@ -195,19 +192,19 @@ public class PlayerService extends IntentService {
         playPause.putExtra("DO", "playPause");
         playPause.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pPlayPause = PendingIntent.getService(ctx, NOT_REQ_PLAY, playPause, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.play, pPlayPause);
+        //rv.setOnClickPendingIntent(R.id.not_play, pPlayPause);
 
         Intent back = new Intent(ctx, PlayerService.class);
         back.putExtra("DO", "back");
         back.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pBack = PendingIntent.getService(ctx, NOT_REQ_BACK, back, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.back, pBack);
+        //rv.setOnClickPendingIntent(R.id.not_back, pBack);
 
         Intent fwd = new Intent(ctx, PlayerService.class);
         fwd.putExtra("DO", "fwd");
         fwd.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pFwd = PendingIntent.getService(ctx, NOT_REQ_FWD, fwd, PendingIntent.FLAG_UPDATE_CURRENT);
-        rv.setOnClickPendingIntent(R.id.fwd, pFwd);
+        //rv.setOnClickPendingIntent(R.id.not_fwd, pFwd);
 
     }
 
