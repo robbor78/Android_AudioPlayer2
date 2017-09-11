@@ -1,7 +1,6 @@
 package com.domain.company.audioplayer2;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -112,10 +111,10 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_exit) {
+            unbind();
+            stopService();
             finish();
-            //moveTaskToBack(true);
-            //android.os.Process.killProcess(android.os.Process.myPid());
-            //System.exit(1);
+
             return true;
         }
 
@@ -179,14 +178,32 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         super.onStop();
         Log.d(TAG, "onStop");
 
-        // Unbind from the service
-        if (mBound) {
-            Log.d(TAG, "unbinding...");
-            unbindService(mConnection);
-            Log.d(TAG, "unbinding end");
-            mBound = false;
-        }
+        unbind();
+    }
 
+    private void unbind() {
+        if (mBound) {
+            try {
+                Log.d(TAG, "unbinding...");
+                unbindService(mConnection);
+                mBound = false;
+                Log.d(TAG, "unbinding end");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void stopService() {
+
+        try {
+            Log.d(TAG, "stopping existing service");
+            Intent intent = new Intent(this, PlayerService.class);
+            stopService(intent);
+            Log.d(TAG, "stopped existing service");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -212,15 +229,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     private void startService(String filePath) {
-        intent = new Intent(this, PlayerService.class);
-
-        try {
-            Log.d(TAG, "stopping existing service");
-            stopService(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        stopService();
+        Intent intent = new Intent(this, PlayerService.class);
         intent.putExtra("FilePath", filePath);
         Log.d(TAG, "starting service... intent=" + intent);
         startService(intent);

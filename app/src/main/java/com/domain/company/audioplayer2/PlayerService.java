@@ -55,7 +55,7 @@ public class PlayerService extends IntentService {
     @Override
     public void onDestroy() {
         // The service is no longer used and is being destroyed
-        Log.d(TAG, "onDestroy");
+        Log.d(TAG, "Player Service onDestroy");
         super.onDestroy();
         stop = true;
     }
