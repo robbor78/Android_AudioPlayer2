@@ -1,16 +1,15 @@
 package com.domain.company.audioplayer2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,6 +23,11 @@ public class MainActivity extends Activity implements ServiceCallbacks {
     private Intent intent;
     private PlayerService mService;
     private boolean mBound = false;
+
+    private static final String[] INITIAL_PERMS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+    private static final int INITIAL_REQUEST = 1339;
 
     public void back(View view) {
 
@@ -78,6 +82,31 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         setContentView(R.layout.activity_main);
 
 
+        if (canReadExternalStorage()) {
+            setup();
+        } else {
+
+            requestPermissions(INITIAL_PERMS, INITIAL_REQUEST);
+        }
+
+    }
+
+
+    private boolean canReadExternalStorage() {
+        return (hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE));
+    }
+
+    private boolean hasPermission(String perm) {
+        return (PackageManager.PERMISSION_GRANTED == checkSelfPermission(perm));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult");
+        setup();
+    }
+
+    private void setup() {
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             filePath = getIntent().getData().getPath();
 
@@ -93,17 +122,18 @@ public class MainActivity extends Activity implements ServiceCallbacks {
             Log.d(TAG, "onCreate no intent");
         }
 
+        // Bind to LocalService
+        Intent intent = new Intent(this, PlayerService.class);
+        Log.d(TAG, "binding service... intent=" + intent);
+        boolean isBound = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Log.d(TAG, "binding service end, isBound=" + isBound);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart");
-        // Bind to LocalService
-        Intent intent = new Intent(this, PlayerService.class);
-        Log.d(TAG, "binding service... intent=" + intent);
-        boolean isBound = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-        Log.d(TAG, "binding service end, isBound=" + isBound);
+
     }
 
 
@@ -121,7 +151,7 @@ public class MainActivity extends Activity implements ServiceCallbacks {
         // Unbind from the service
         if (mBound) {
             Log.d(TAG, "unbinding...");
-            //   unbindService(mConnection);
+            unbindService(mConnection);
             Log.d(TAG, "unbinding end");
             mBound = false;
         }
@@ -356,7 +386,6 @@ public class MainActivity extends Activity implements ServiceCallbacks {
 //        b.setText(v ? "S" : "P");
 
     }
-
 
 
 }
