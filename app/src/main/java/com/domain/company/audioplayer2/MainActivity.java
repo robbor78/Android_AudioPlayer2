@@ -21,15 +21,15 @@ import java.io.File;
 public class MainActivity extends AppCompatActivity implements ServiceCallbacks {
 
     private static final String TAG = "MainActivity";
+    private static final String[] INITIAL_PERMS = {Manifest.permission.READ_EXTERNAL_STORAGE};
+    private static final int INITIAL_REQUEST = 1339;
+    private static final String SAVED_ISSTARTED = "IsStarted";
+
     private String filePath;
     private Intent intent;
     private PlayerService mService;
     private boolean mBound = false;
 
-    private static final String[] INITIAL_PERMS = {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-    };
-    private static final int INITIAL_REQUEST = 1339;
 
     public void back(View view) {
 
@@ -84,13 +84,18 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         setSupportActionBar(toolbar);
 
 
-        if (canReadExternalStorage()) {
+        if (IsAlreadyRunning(savedInstanceState)) {
+            Log.d(TAG, "Already running.");
+            bindToLocalService();
+        } else if (canReadExternalStorage()) {
             setup();
         } else {
-
             requestPermissions(INITIAL_PERMS, INITIAL_REQUEST);
         }
+    }
 
+    private boolean IsAlreadyRunning(Bundle b) {
+        return b != null && !b.isEmpty() && b.getBoolean(SAVED_ISSTARTED);
     }
 
 
@@ -136,6 +141,11 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     private void setup() {
+        startService();
+        bindToLocalService();
+    }
+
+    private void startService() {
         if (Intent.ACTION_VIEW.equals(getIntent().getAction())) {
             filePath = getIntent().getData().getPath();
             Log.d(TAG, "onCreate: " + filePath);
@@ -145,8 +155,9 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
             Log.d(TAG, "onCreate no intent");
         }
+    }
 
-        // Bind to LocalService
+    private void bindToLocalService() {
         Intent intent = new Intent(this, PlayerService.class);
         Log.d(TAG, "binding service... intent=" + intent);
         boolean isBound = bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
@@ -209,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putString("FilePath", filePath);
+        savedInstanceState.putBoolean(SAVED_ISSTARTED, true);
         Log.d(TAG, "onSaveInstanceState");
     }
 
