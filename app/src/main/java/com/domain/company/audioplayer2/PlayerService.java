@@ -36,6 +36,7 @@ public class PlayerService extends IntentService {
     private RemoteViews rv = null;
     private final IBinder mBinder = new PlayerService.LocalBinder();
 
+
     public class LocalBinder extends Binder {
         PlayerService getService() {
             return PlayerService.this;
@@ -51,7 +52,7 @@ public class PlayerService extends IntentService {
         Log.d(TAG, "PlayerService player starting... " + intent + " " + this);
         String action = (String) intent.getExtras().get("DO");
         Log.d(TAG, "action= " + action);
-        if (action!=null) {
+        if (action != null) {
             handleIntent(intent);
         }
         return super.onStartCommand(intent, flags, startId);
@@ -257,12 +258,19 @@ public class PlayerService extends IntentService {
         seek(60000);
     }
 
-    public void play() {
+    public void seekRelative(double i) {
+        playOrUnpause();
+        Log.d(TAG, "i= " + i);
+        seekAbs((int) (mediaPlayer.getDuration() * i));
+    }
 
+
+    public void play() {
         if (isPlaying) {
             Log.d(TAG, "already playing ... nothing to do ... returining " + this);
             return;
         }
+        if (filePath==null) { return;}
 
         FileInputStream fis = null;
         try {
@@ -281,6 +289,8 @@ public class PlayerService extends IntentService {
             Log.d(TAG, "init playing end");
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             if (fis != null) {
@@ -334,9 +344,15 @@ public class PlayerService extends IntentService {
     }
 
     private void seek(int delta) {
-        Log.d(TAG, "PlayerService seeking...");
+        Log.d(TAG, "PlayerService seeking, delta= " + delta + "...");
         int np = mediaPlayer.getCurrentPosition() + delta;
         mediaPlayer.seekTo(np);
+        Log.d(TAG, "PlayerService seeking end");
+    }
+
+    private void seekAbs(int pos) {
+        Log.d(TAG, "PlayerService seeking, pos= " + pos + "...");
+        mediaPlayer.seekTo(pos);
         Log.d(TAG, "PlayerService seeking end");
     }
 

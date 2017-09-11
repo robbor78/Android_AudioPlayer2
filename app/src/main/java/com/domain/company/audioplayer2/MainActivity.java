@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 
 import java.io.File;
 
@@ -31,15 +32,37 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private Intent intent;
     private PlayerService mService;
     private boolean mBound = false;
-
+    private SeekBar sb = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called " + savedInstanceState);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        sb = (SeekBar) findViewById(R.id.sb);
+        sb.setMax(100);
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mService.seekRelative(i / 100.0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         if (IsAlreadyRunning(savedInstanceState)) {
             Log.d(TAG, "Already running.");
             bindToLocalService();
@@ -230,11 +253,17 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     public void info(PlayerInfo pi) {
         final String title = pi.getTitle();
         final String subTitle = pi.getSubTitle();
+        final int pos = pi.getPosition();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 getSupportActionBar().setTitle(title);
                 getSupportActionBar().setSubtitle(subTitle);
+                sb.setProgress(0);
+                sb.setMax(0);
+                sb.setMax(100);
+                sb.setProgress(pos);
+                sb.refreshDrawableState();
             }
         });
     }
