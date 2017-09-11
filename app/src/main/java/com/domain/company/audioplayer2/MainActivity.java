@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private static final String[] INITIAL_PERMS = {Manifest.permission.READ_EXTERNAL_STORAGE};
     private static final int INITIAL_REQUEST = 1339;
     private static final String SAVED_ISSTARTED = "IsStarted";
+    public static final String EXTRA_KEY_FILEPATH = "FilePath";
 
     private String filePath;
     private Intent intent;
@@ -228,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     @Override
     public void onNewIntent(Intent intent) {
         Log.d(TAG, "received new intent...");
-        filePath = intent.getStringExtra("FilePath");
+        filePath = intent.getStringExtra(EXTRA_KEY_FILEPATH);
         setTitle(filePath);
     }
 
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private void startService(String filePath) {
         stopService();
         Intent intent = new Intent(this, PlayerService.class);
-        intent.putExtra("FilePath", filePath);
+        intent.putExtra(EXTRA_KEY_FILEPATH, filePath);
         Log.d(TAG, "starting service... intent=" + intent);
         startService(intent);
         Log.d(TAG, "starting service end");
