@@ -33,50 +33,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private boolean mBound = false;
 
 
-    public void back(View view) {
-
-        //toggle(false,true);
-        mService.back();
-//        seek(-5000);
-//        isBacking = true;
-    }
-
-    public void fwd(View view) {
-        //toggle(false,true);
-        mService.forward();
-//        if (!isPlaying) {
-//            startPlay();
-//        }
-//        seek(5000);
-//        isForward = true;
-    }
-
-    public void bback(View view) {
-        //toggle(false,true);
-        mService.bback();
-//        seek(-60000);
-//        isBBacking = true;
-    }
-
-    public void ffwd(View view) {
-        //toggle(false,true);
-        mService.ffwd();
-//        if (!isPlaying) {
-//            startPlay();
-//        }
-//        seek(60000);
-//        isFForward = true;
-    }
-
-    public void play(View view) {
-        mService.togglePlay();
-    }
-
-    public void pause(View view) {
-        mService.togglePause();
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate called " + savedInstanceState);
@@ -445,6 +401,34 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 //        b = (Button) findViewById(R.id.play);
 //        b.setText(v ? "S" : "P");
 
+    }
+
+    public void play(View view) {
+        mService.togglePlay();
+    }
+
+    public void pause(View view) {
+        mService.togglePause();
+    }
+
+    public void back(View view) {
+        //toggle(false,true);
+        mService.back();
+    }
+
+    public void fwd(View view) {
+        //toggle(false,true);
+        mService.forward();
+    }
+
+    public void bback(View view) {
+        //toggle(false,true);
+        mService.bback();
+    }
+
+    public void ffwd(View view) {
+        //toggle(false,true);
+        mService.ffwd();
     }
 
 
