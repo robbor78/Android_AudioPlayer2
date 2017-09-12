@@ -138,7 +138,7 @@ public class PlayerService extends IntentService {
 
         mBuilder = new Notification.Builder(this);
 
-        Notification notification = mBuilder.setSmallIcon(R.drawable.notification_icon)
+        Notification notification = mBuilder.setSmallIcon(R.drawable.notification_icon2)
                 .setAutoCancel(false)
                 .setOngoing(true)
                 .setContentIntent(pendingIntent)
@@ -332,7 +332,7 @@ public class PlayerService extends IntentService {
     }
 
     private void playOrTogglePause() {
-        if (state != PlayerState.PLAYING) {
+        if (state == PlayerState.STOPPED) {
             //if (!isPlaying) {
             play();
         } else {
