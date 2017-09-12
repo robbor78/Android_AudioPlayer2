@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     private PlayerService mService;
     private boolean mBound = false;
     private SeekBar sb = null;
+    private boolean sbChangedByProgram = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +46,12 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         setSupportActionBar(toolbar);
 
         sb = (SeekBar) findViewById(R.id.sb);
-        sb.setMax(100);
         sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (sbChangedByProgram) {
+                    return;
+                }
                 mService.seekRelative(i / 100.0);
             }
 
@@ -253,17 +256,16 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     public void info(PlayerInfo pi) {
         final String title = pi.getTitle();
         final String subTitle = pi.getSubTitle();
-        final int pos = pi.getPosition();
+        final int pos = pi.getPercent();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 getSupportActionBar().setTitle(title);
                 getSupportActionBar().setSubtitle(subTitle);
-                sb.setProgress(0);
-                sb.setMax(0);
-                sb.setMax(100);
+                sbChangedByProgram = true;
+                Log.d(TAG,"pos= "+pos);
                 sb.setProgress(pos);
-                sb.refreshDrawableState();
+                sbChangedByProgram = false;
             }
         });
     }

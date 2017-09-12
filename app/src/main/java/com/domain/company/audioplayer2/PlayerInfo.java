@@ -25,11 +25,11 @@ public class PlayerInfo {
         return getTitle() + " " + getSubTitle();
     }
 
-    public int getPosition() {
-        int position = 0;
+    public int getPercent() {
+        int percent = 0;
         if (duration!=0) {
-            position = (int)(100.0*(double)position/(double)duration);
+            percent = (int)(100.0*(double)position/(double)duration);
         }
-        return position;
+        return percent;
     }
 }
