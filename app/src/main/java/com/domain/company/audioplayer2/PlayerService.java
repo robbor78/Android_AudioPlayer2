@@ -161,7 +161,7 @@ public class PlayerService extends IntentService {
 
         try {
             stop();
-            updateInfo();
+            //updateInfo();
             mediaPlayer.release();
         } finally {
             mediaPlayer = null;
@@ -217,13 +217,9 @@ public class PlayerService extends IntentService {
         if (state == PlayerState.PAUSED) {
 //        if (isPlaying) {
 //            if (isPause) {
-            mediaPlayer.start();
-            state = PlayerState.PLAYING;
-            serviceCallbacks.unpaused();
+            resumePlay();
         } else if (state == PlayerState.PLAYING) {
-            mediaPlayer.pause();
-            state = PlayerState.PAUSED;
-            serviceCallbacks.paused();
+            pause();
         }
         //isPause = !isPause;
         //state = PlayerState.PLAYING;
@@ -356,7 +352,6 @@ public class PlayerService extends IntentService {
         } else if (state == PlayerState.STOPPED) {
             togglePlay();
         }
-
     }
 
     private void unpause() {
@@ -368,10 +363,29 @@ public class PlayerService extends IntentService {
         }
     }
 
+    private void resumePlay() {
+        mediaPlayer.start();
+        state = PlayerState.PLAYING;
+        serviceCallbacks.unpaused();
+    }
+
+    private void pause() {
+        mediaPlayer.pause();
+        state = PlayerState.PAUSED;
+        serviceCallbacks.paused();
+    }
+
     private void seek(int delta) {
         Log.d(TAG, "PlayerService seeking, delta= " + delta + "...");
         int np = mediaPlayer.getCurrentPosition() + delta;
-        mediaPlayer.seekTo(np);
+        if (np >= mediaPlayer.getDuration()) {
+            np = mediaPlayer.getDuration()-1;
+            pause();
+            mediaPlayer.seekTo(np);
+        } else {
+            mediaPlayer.seekTo(np);
+        }
+
         Log.d(TAG, "PlayerService seeking end");
     }
 

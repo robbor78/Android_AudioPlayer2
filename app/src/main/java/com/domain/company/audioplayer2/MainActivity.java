@@ -83,12 +83,16 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_exit) {
-            unbind();
-            stopService();
+            exit();
             finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void exit() {
+        unbind();
+        stopService();
     }
 
     private boolean canReadExternalStorage() {
@@ -177,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+        exit();
     }
 
     @Override
@@ -269,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                 getSupportActionBar().setTitle(title);
                 getSupportActionBar().setSubtitle(subTitle);
                 sbChangedByProgram = true;
-                Log.d(TAG, "pos= " + pos);
+                //Log.d(TAG, "pos= " + pos);
                 sb.setProgress(pos);
                 sbChangedByProgram = false;
             }
