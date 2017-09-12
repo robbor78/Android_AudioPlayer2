@@ -96,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     private boolean canReadExternalStorage() {
-        return (hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE));
+        return (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP ||
+                hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE));
     }
 
     private boolean hasPermission(String perm) {
@@ -181,7 +182,9 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-        exit();
+        if (!isChangingConfigurations()) {
+            exit();
+        }
     }
 
     @Override
@@ -199,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     private void setTitle(String filePath) {
+        Log.d(TAG,"setTitle filepath= "+filePath);
+        //if (filePath==null) {return;}
         getSupportActionBar().setTitle(new File(filePath).getName());
     }
 
