@@ -151,6 +151,7 @@ public class PlayerService extends IntentService {
     private void loop() {
         try {
             while (!stopServiceLoop) {
+                sendState();
                 updateInfo();
                 Thread.sleep(1000);
             }
@@ -166,6 +167,11 @@ public class PlayerService extends IntentService {
         } finally {
             mediaPlayer = null;
         }
+    }
+
+    private void sendState() {
+        if (serviceCallbacks==null) {return;}
+        serviceCallbacks.sendState(state);
     }
 
     private void setListeners(RemoteViews rv) {
@@ -226,28 +232,19 @@ public class PlayerService extends IntentService {
         //}
     }
 
-    public void update() {
-        switch (state) {
-            case PAUSED:
-                serviceCallbacks.paused();
-                break;
-            case STOPPED:
-                serviceCallbacks.stopped();
-                break;
-            case PLAYING:
-                serviceCallbacks.playing();
-                break;
-        }
-//        if (isPlaying) {
-//            if (isPause) {
+//    public void update() {
+//        switch (state) {
+//            case PAUSED:
 //                serviceCallbacks.paused();
-//            } else {
+//                break;
+//            case STOPPED:
+//                serviceCallbacks.stopped();
+//                break;
+//            case PLAYING:
 //                serviceCallbacks.playing();
-//            }
-//        } else {
-//            serviceCallbacks.stopped();
+//                break;
 //        }
-    }
+//    }
 
     public void back() {
         unpause();
@@ -366,13 +363,11 @@ public class PlayerService extends IntentService {
     private void resumePlay() {
         mediaPlayer.start();
         state = PlayerState.PLAYING;
-        serviceCallbacks.unpaused();
     }
 
     private void pause() {
         mediaPlayer.pause();
         state = PlayerState.PAUSED;
-        serviceCallbacks.paused();
     }
 
     private void seek(int delta) {

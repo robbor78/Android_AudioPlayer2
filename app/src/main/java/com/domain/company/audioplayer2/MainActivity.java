@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                 setTitle(filePath);
                 wiredUpSeekbar();
                 mService.play();
-                mService.update();
+                //mService.update();
                 Log.d(TAG, "service connected");
             } else {
                 Log.d(TAG, "Service NOT connected!");
@@ -292,8 +292,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         });
     }
 
-    @Override
-    public void stopped() {
+    //    @Override
+    private void stopped() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -319,8 +319,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         });
     }
 
-    @Override
-    public void playing() {
+    //    @Override
+    private void playing() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -346,8 +346,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         });
     }
 
-    @Override
-    public void paused() {
+    //    @Override
+    private void paused() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -373,31 +373,46 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         });
     }
 
+//    @Override
+//    public void unpaused() {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Button b = (Button) findViewById(R.id.act_back);
+//                b.setEnabled(true);
+//
+//                b = (Button) findViewById(R.id.act_bback);
+//                b.setEnabled(true);
+//
+//                b = (Button) findViewById(R.id.act_fwd);
+//                b.setEnabled(true);
+//
+//                b = (Button) findViewById(R.id.act_ffwd);
+//                b.setEnabled(true);
+//
+//                b = (Button) findViewById(R.id.act_pause);
+//                b.setEnabled(true);
+//                b.setText("||");
+//
+//                b = (Button) findViewById(R.id.act_play);
+//                b.setText("S");
+//            }
+//        });
+//    }
+
     @Override
-    public void unpaused() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Button b = (Button) findViewById(R.id.act_back);
-                b.setEnabled(true);
-
-                b = (Button) findViewById(R.id.act_bback);
-                b.setEnabled(true);
-
-                b = (Button) findViewById(R.id.act_fwd);
-                b.setEnabled(true);
-
-                b = (Button) findViewById(R.id.act_ffwd);
-                b.setEnabled(true);
-
-                b = (Button) findViewById(R.id.act_pause);
-                b.setEnabled(true);
-                b.setText("||");
-
-                b = (Button) findViewById(R.id.act_play);
-                b.setText("S");
-            }
-        });
+    public void sendState(PlayerState state) {
+        switch (state) {
+            case PAUSED:
+                paused();
+                break;
+            case PLAYING:
+                playing();
+                break;
+            case STOPPED:
+                stopped();
+                break;
+        }
     }
 
     private void toggle(boolean v, boolean all) {
@@ -431,22 +446,18 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     public void back(View view) {
-        //toggle(false,true);
         mService.back();
     }
 
     public void fwd(View view) {
-        //toggle(false,true);
         mService.forward();
     }
 
     public void bback(View view) {
-        //toggle(false,true);
         mService.bback();
     }
 
     public void ffwd(View view) {
-        //toggle(false,true);
         mService.ffwd();
     }
 

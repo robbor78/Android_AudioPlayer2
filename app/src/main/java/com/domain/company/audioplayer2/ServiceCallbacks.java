@@ -5,11 +5,13 @@ public interface ServiceCallbacks {
 
     void seekComplete();
 
-    void stopped();
+//    void stopped();
+//
+//    void playing();
+//
+//    void paused();
+//
+//    void unpaused();
 
-    void playing();
-
-    void paused();
-
-    void unpaused();
+    void sendState(PlayerState state);
 }
