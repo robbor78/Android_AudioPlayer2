@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             setTitle(filePath);
             startService(filePath);
         } else {
-
             Log.d(TAG, "onCreate no intent");
         }
     }
@@ -167,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
     }
 
     private void stopService() {
-
         try {
             Log.d(TAG, "stopping existing service");
             Intent intent = new Intent(this, PlayerService.class);
@@ -292,7 +290,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             @Override
             public void run() {
                 Log.d(TAG, "seekComplete");
-                toggle(true, true);
             }
         });
     }
@@ -378,32 +375,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         });
     }
 
-//    @Override
-//    public void unpaused() {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Button b = (Button) findViewById(R.id.act_back);
-//                b.setEnabled(true);
-//
-//                b = (Button) findViewById(R.id.act_bback);
-//                b.setEnabled(true);
-//
-//                b = (Button) findViewById(R.id.act_fwd);
-//                b.setEnabled(true);
-//
-//                b = (Button) findViewById(R.id.act_ffwd);
-//                b.setEnabled(true);
-//
-//                b = (Button) findViewById(R.id.act_pause);
-//                b.setEnabled(true);
-//                b.setText("||");
-//
-//                b = (Button) findViewById(R.id.act_play);
-//                b.setText("S");
-//            }
-//        });
-//    }
 
     @Override
     public void sendState(PlayerState state) {
@@ -420,27 +391,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         }
     }
 
-    private void toggle(boolean v, boolean all) {
-//        Button b = (Button) findViewById(R.id.back);
-//        b.setEnabled(v);
-//
-//        b = (Button) findViewById(R.id.bback);
-//        b.setEnabled(v);
-//
-//        if (all) {
-//            b = (Button) findViewById(R.id.fwd);
-//            b.setEnabled(v);
-//
-//            b = (Button) findViewById(R.id.ffwd);
-//            b.setEnabled(v);
-//        }
-//
-//        b = (Button) findViewById(R.id.pause);
-//        b.setEnabled(v);
-//
-//        b = (Button) findViewById(R.id.play);
-//        b.setText(v ? "S" : "P");
-    }
+
 
     public void play(View view) {
         mService.togglePlay();

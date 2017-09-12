@@ -170,7 +170,9 @@ public class PlayerService extends IntentService {
     }
 
     private void sendState() {
-        if (serviceCallbacks==null) {return;}
+        if (serviceCallbacks == null) {
+            return;
+        }
         serviceCallbacks.sendState(state);
     }
 
@@ -211,10 +213,9 @@ public class PlayerService extends IntentService {
     }
 
     public void togglePlay() {
-        if (state == PlayerState.PLAYING) {
-            //if (isPlaying) {
+        if (state == PlayerState.PLAYING || state == PlayerState.PAUSED) {
             stop();
-        } else {
+        } else if (state == PlayerState.STOPPED) {
             play();
         }
     }
@@ -374,7 +375,7 @@ public class PlayerService extends IntentService {
         Log.d(TAG, "PlayerService seeking, delta= " + delta + "...");
         int np = mediaPlayer.getCurrentPosition() + delta;
         if (np >= mediaPlayer.getDuration()) {
-            np = mediaPlayer.getDuration()-1;
+            np = mediaPlayer.getDuration() - 1;
             pause();
             mediaPlayer.seekTo(np);
         } else {
