@@ -25,9 +25,10 @@ public class PlayerService extends IntentService {
     private static final int NOT_REQ_BACK = 40;
     private static final int NOT_REQ_FWD = 50;
 
-    private boolean stop = false;
-    private boolean isPlaying = false;
-    private boolean isPause = false;
+    private boolean stopServiceLoop = false;
+    //private boolean isPlaying = false;
+    //private boolean isPause = false;
+    private PlayerState state = PlayerState.STOPPED;
     private String filePath;
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private ServiceCallbacks serviceCallbacks = null;
@@ -68,7 +69,7 @@ public class PlayerService extends IntentService {
     public void onDestroy() {
         Log.d(TAG, "Player Service onDestroy");
         super.onDestroy();
-        stop = true;
+        stopServiceLoop = true;
     }
 
     private void handleIntent(Intent intent) {
@@ -90,9 +91,10 @@ public class PlayerService extends IntentService {
     }
 
     private void handleStartup(Intent intent) {
-        stop = false;
-        isPlaying = false;
-        isPause = false;
+        stopServiceLoop = false;
+        state = PlayerState.STOPPED;
+        //isPlaying = false;
+        //isPause = false;
         filePath = intent.getStringExtra(MainActivity.EXTRA_KEY_FILEPATH);
         wireUpPlayer();
         setupNotification();
@@ -143,15 +145,12 @@ public class PlayerService extends IntentService {
                 .setContent(rv)
                 .build();
 
-
-//        notification.contentView = rv;
-
         startForeground(ONGOING_NOTIFICATION_ID, notification);
     }
 
     private void loop() {
         try {
-            while (!stop) {
+            while (!stopServiceLoop) {
                 updateInfo();
                 Thread.sleep(1000);
             }
@@ -206,7 +205,8 @@ public class PlayerService extends IntentService {
     }
 
     public void togglePlay() {
-        if (isPlaying) {
+        if (state == PlayerState.PLAYING) {
+            //if (isPlaying) {
             stop();
         } else {
             play();
@@ -214,28 +214,43 @@ public class PlayerService extends IntentService {
     }
 
     public void togglePause() {
-        if (isPlaying) {
-            if (isPause) {
-                mediaPlayer.start();
-                serviceCallbacks.unpaused();
-            } else {
-                mediaPlayer.pause();
-                serviceCallbacks.paused();
-            }
-            isPause = !isPause;
+        if (state == PlayerState.PAUSED) {
+//        if (isPlaying) {
+//            if (isPause) {
+            mediaPlayer.start();
+            state = PlayerState.PLAYING;
+            serviceCallbacks.unpaused();
+        } else if (state == PlayerState.PLAYING) {
+            mediaPlayer.pause();
+            state = PlayerState.PAUSED;
+            serviceCallbacks.paused();
         }
+        //isPause = !isPause;
+        //state = PlayerState.PLAYING;
+        //}
     }
 
     public void update() {
-        if (isPlaying) {
-            if (isPause) {
+        switch (state) {
+            case PAUSED:
                 serviceCallbacks.paused();
-            } else {
+                break;
+            case STOPPED:
+                serviceCallbacks.stopped();
+                break;
+            case PLAYING:
                 serviceCallbacks.playing();
-            }
-        } else {
-            serviceCallbacks.stopped();
+                break;
         }
+//        if (isPlaying) {
+//            if (isPause) {
+//                serviceCallbacks.paused();
+//            } else {
+//                serviceCallbacks.playing();
+//            }
+//        } else {
+//            serviceCallbacks.stopped();
+//        }
     }
 
     public void back() {
@@ -266,11 +281,14 @@ public class PlayerService extends IntentService {
 
 
     public void play() {
-        if (isPlaying) {
+        if (state == PlayerState.PLAYING) {
+            //if (isPlaying) {
             Log.d(TAG, "already playing ... nothing to do ... returining " + this);
             return;
         }
-        if (filePath==null) { return;}
+        if (filePath == null) {
+            return;
+        }
 
         FileInputStream fis = null;
         try {
@@ -283,8 +301,9 @@ public class PlayerService extends IntentService {
             mediaPlayer.prepare();
             mediaPlayer.start();
 
-            isPlaying = true;
-            isPause = false;
+            //isPlaying = true;
+            //isPause = false;
+            state = PlayerState.PLAYING;
 
             Log.d(TAG, "init playing end");
 
@@ -303,7 +322,8 @@ public class PlayerService extends IntentService {
     }
 
     private void stop() {
-        if (!isPlaying) {
+        if (state == PlayerState.STOPPED) {
+            //if (!isPlaying) {
             return;
         }
 
@@ -313,12 +333,14 @@ public class PlayerService extends IntentService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        isPlaying = false;
-        isPause = false;
+        state = PlayerState.STOPPED;
+        //isPlaying = false;
+        //isPause = false;
     }
 
     private void playOrTogglePause() {
-        if (!isPlaying) {
+        if (state != PlayerState.PLAYING) {
+            //if (!isPlaying) {
             play();
         } else {
             togglePause();
@@ -326,20 +348,23 @@ public class PlayerService extends IntentService {
     }
 
     private void playOrUnpause() {
-        if (isPlaying) {
-            if (isPause) {
-                togglePause();
-            }
-        } else {
+        if (state == PlayerState.PAUSED) {
+//        if (isPlaying) {
+//            if (isPause) {
+            togglePause();
+            //}
+        } else if (state == PlayerState.STOPPED) {
             togglePlay();
         }
+
     }
 
     private void unpause() {
-        if (isPlaying) {
-            if (isPause) {
-                togglePause();
-            }
+        if (state == PlayerState.PAUSED) {
+//        if (isPlaying) {
+//            if (isPause) {
+            togglePause();
+//            }
         }
     }
 
@@ -360,7 +385,8 @@ public class PlayerService extends IntentService {
         if (serviceCallbacks == null) {
             return;
         }
-        if (!isPause) {
+        if (state != PlayerState.PAUSED) {
+            //if (!isPause) {
             PlayerInfo pi = getPlayerInfo();
             updateNotification(pi);
             serviceCallbacks.info(pi);

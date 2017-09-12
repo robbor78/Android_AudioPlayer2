@@ -45,27 +45,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        sb = (SeekBar) findViewById(R.id.sb);
-        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (sbChangedByProgram) {
-                    return;
-                }
-                mService.seekRelative(i / 100.0);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
         if (IsAlreadyRunning(savedInstanceState)) {
             Log.d(TAG, "Already running.");
             bindToLocalService();
@@ -235,15 +214,19 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             Log.d(TAG, "onServiceConnected...");
             PlayerService.LocalBinder binder = (PlayerService.LocalBinder) service;
             mService = binder.getService();
-            mService.setCallbacks(MainActivity.this);
-            mBound = true;
+            mBound = mService != null;
+            if (mBound) {
+                mService.setCallbacks(MainActivity.this);
 
-            filePath = mService.getFilePath();
-            setTitle(filePath);
-            mService.play();
-            mService.update();
-
-            Log.d(TAG, "service connected");
+                filePath = mService.getFilePath();
+                setTitle(filePath);
+                wiredUpSeekbar();
+                mService.play();
+                mService.update();
+                Log.d(TAG, "service connected");
+            } else {
+                Log.d(TAG, "Service NOT connected!");
+            }
         }
 
         @Override
@@ -251,6 +234,29 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             mBound = false;
         }
     };
+
+    private void wiredUpSeekbar() {
+        sb = (SeekBar) findViewById(R.id.sb);
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                if (sbChangedByProgram) {
+                    return;
+                }
+                mService.seekRelative(i / 100.0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+    }
 
     @Override
     public void info(PlayerInfo pi) {
@@ -263,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                 getSupportActionBar().setTitle(title);
                 getSupportActionBar().setSubtitle(subTitle);
                 sbChangedByProgram = true;
-                Log.d(TAG,"pos= "+pos);
+                Log.d(TAG, "pos= " + pos);
                 sb.setProgress(pos);
                 sbChangedByProgram = false;
             }
