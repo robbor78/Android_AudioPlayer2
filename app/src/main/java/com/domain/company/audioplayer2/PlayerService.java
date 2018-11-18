@@ -29,6 +29,7 @@ public class PlayerService extends IntentService {
     //private boolean isPlaying = false;
     //private boolean isPause = false;
     private PlayerState state = PlayerState.STOPPED;
+    private float speed = 1.0f;
     private String filePath;
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private ServiceCallbacks serviceCallbacks = null;
@@ -268,11 +269,18 @@ public class PlayerService extends IntentService {
     }
 
     public void slower() {
-
+        updateSpeed(-0.25f);
     }
 
     public void faster() {
+        updateSpeed(0.25f);
+    }
 
+    private void updateSpeed(float inc) {
+        if (state != PlayerState.STOPPED) {
+            speed += inc;
+            mediaPlayer.setPlaybackParams(mediaPlayer.getPlaybackParams().setSpeed(speed));
+        }
     }
 
     public void seekRelative(double i) {
