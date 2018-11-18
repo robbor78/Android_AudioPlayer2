@@ -417,4 +417,8 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
         mService.ffwd();
     }
 
+    public void slower(View view) {mService.slower();}
+
+    public void faster(View view) {mService.faster();}
+
 }

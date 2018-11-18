@@ -267,6 +267,14 @@ public class PlayerService extends IntentService {
         seek(60000);
     }
 
+    public void slower() {
+
+    }
+
+    public void faster() {
+
+    }
+
     public void seekRelative(double i) {
         playOrUnpause();
         Log.d(TAG, "i= " + i);
