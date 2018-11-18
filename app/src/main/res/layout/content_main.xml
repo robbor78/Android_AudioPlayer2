@@ -87,6 +87,31 @@
         />
     </LinearLayout>
 
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:orientation="horizontal">
+        <Button
+                android:id="@+id/act_slower"
+                android:text="&lt;&lt;&lt;"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="slower"
+                android:enabled="true"
+        />
+
+        <Button
+                android:id="@+id/act_faster"
+                android:text="&gt;&gt;&gt;"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="faster"
+                android:enabled="true"
+        />
+    </LinearLayout>
+
     <SeekBar
             android:id="@+id/sb"
             android:layout_width="match_parent"
